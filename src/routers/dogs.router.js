@@ -3,6 +3,7 @@ const {
     validateDogBody,
     requiredDogBodyField,
 } = require('../middleware/validate-dog.middleware');
+const { isAuthenticated } = require('../middleware/auth.middleware');
 const {
     getDogByIdCtrl,
     filterDogFromQueryCtrl,
@@ -20,10 +21,16 @@ router.get('/:dogId', getDogByIdCtrl);
 //{status: 'available', gender: 'M'}
 router.get('/', filterDogFromQueryCtrl);
 
-router.post('/', validateDogBody, requiredDogBodyField, createNewDogCtrl);
+router.post(
+    '/',
+    isAuthenticated,
+    validateDogBody,
+    requiredDogBodyField,
+    createNewDogCtrl
+);
 
-router.put('/:dogId', validateDogBody, getFilteredDogListCtrl);
+router.put('/:dogId', isAuthenticated, validateDogBody, getFilteredDogListCtrl);
 
-router.delete('/:dogId', deleteDogByIdCtrl);
+router.delete('/:dogId', isAuthenticated, deleteDogByIdCtrl);
 
 module.exports = router;
