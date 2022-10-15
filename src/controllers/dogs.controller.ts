@@ -7,15 +7,37 @@ import {
     getDogById,
     updateDog,
 } from '../services/dog.service';
+import logger from '../utils/logger';
+import { errorClassify_IsInvalidObjectId } from '../utils/helper';
 
 export async function getDogByIdCtrl(
     req: Request,
     res: Response,
     _next: NextFunction // it says to TS that i dont must to use this variable
 ) {
-    const dog: IDog | undefined = await getDogById(req.params.dogId);
+    try {
+        const dog: IDog | undefined = await getDogById(
+            req.id,
+            req.params.dogId
+        );
 
-    res.json(dog);
+        logger.debug(req.id, 'Response the find dog by dogId', {
+            params: req.params,
+            dog,
+        });
+        res.json(dog);
+    } catch (e) {
+        const errMsg = (<any>e).message;
+        if (errorClassify_IsInvalidObjectId(errMsg)) {
+            logger.warn(req.id, 'Failed to find dog by invalid dogId', {
+                params: req.params,
+            });
+        } else {
+            logger.error(req.id, 'Failed to find dog by dogId', {
+                message: errMsg,
+            });
+        }
+    }
 }
 
 export async function updateDogCtrl(
@@ -24,7 +46,6 @@ export async function updateDogCtrl(
     next: NextFunction
 ) {
     const dog: IDog = {
-        // ...(coundition                =>    act                )
         ...(req.body.race !== undefined && { race: req.body.race }),
         ...(req.body.gender !== undefined && { gender: req.body.gender }),
         ...(req.body.age !== undefined && { age: req.body.age }),

@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import passport from 'passport';
 
 import {
@@ -6,15 +6,11 @@ import {
     getUserByIdCtrl,
 } from '../controllers/user.controller';
 import { isAuthenticatedMW } from '../middleware/auth.middleware';
+import { logRequestedUrlMW } from '../middleware/genral.middleware';
 
 const router = express.Router();
 
-router.use(function (req: Request, res: Response, next: NextFunction) {
-    console.log(
-        `${req.method}:${req.originalUrl} body: ${JSON.stringify(req.body)}`
-    );
-    next();
-});
+router.use(logRequestedUrlMW);
 
 /**
  * @swagger

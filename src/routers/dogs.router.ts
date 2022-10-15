@@ -12,15 +12,11 @@ import {
     validateOwnerMW,
     validateAndConvertQuery,
 } from '../middleware/dogs.middleware';
+import { logRequestedUrlMW } from '../middleware/genral.middleware';
 
 const router = express.Router();
 
-router.use(function (req: Request, res: Response, next: NextFunction) {
-    console.log(
-        `${req.method}:${req.originalUrl} body: ${JSON.stringify(req.body)}`
-    );
-    next();
-});
+router.use(logRequestedUrlMW);
 
 /**
  * @swagger

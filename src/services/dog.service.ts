@@ -1,9 +1,13 @@
 import { IDog, IDogQuery, IFilterResult } from '../interfaces/dog.interface';
-import { DogModel } from '../models/dog.model';
+import { DogModel } from '../models';
 import { filterDogsAggregation } from '../aggregations/filterDogs.aggregations';
+import logger from '../utils/logger';
 
-// function : Promise<...> ... = outPut type of function
-export async function getDogById(dogId: string): Promise<IDog | undefined> {
+export async function getDogById(
+    requestId: string,
+    dogId: string
+): Promise<IDog | undefined> {
+    logger.debug(requestId, 'db is finding dog by dogId', { dogId });
     const dogDoc: any = await DogModel.findById(dogId);
 
     return dogDoc?.toJSON() as unknown as IDog | undefined;

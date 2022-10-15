@@ -1,6 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express';
+import { logRequestedUrlMW } from '../middleware/genral.middleware';
 
 const router = express.Router();
+
+router.use(logRequestedUrlMW);
 
 /**
  * @swagger

@@ -5,6 +5,7 @@ declare global {
         interface Request {
             user?: any;
             queryFilters?: IDogQuery;
+            id: string;
         }
     }
 }

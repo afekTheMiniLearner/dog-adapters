@@ -1,15 +1,18 @@
 import mongoose from 'mongoose';
+import logger from '../utils/logger';
+import { REQUEST_ID } from '../utils/consts';
 
 export async function connectDB(uri: string) {
     if (mongoose.connection.readyState !== 0) return;
+    logger.info(REQUEST_ID, 'connecting to mongodb database');
 
     return mongoose
         .connect(uri)
         .then(() => {
-            console.log('connected to database');
+            logger.info(REQUEST_ID, 'connected to database');
         })
-        .catch((err) => {
-            console.log(`failed to connect, error:${err}`);
-            throw err;
+        .catch((error) => {
+            logger.error(REQUEST_ID, 'failed to connect db', { error });
+            throw error;
         });
 }
