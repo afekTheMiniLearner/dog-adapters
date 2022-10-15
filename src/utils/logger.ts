@@ -1,6 +1,11 @@
 import winston from 'winston';
 import winstonDailyRotateFile from 'winston-daily-rotate-file';
-import { LOGGING_MODE, NODE_ENV } from './environment-variables';
+import {
+    LOGGING_LINE_TRACE,
+    LOGGING_MODE,
+    NODE_ENV,
+} from './environment-variables';
+import { LOG_DIR_PATH } from './paths';
 
 const enum LEVELS {
     error = 'error',
@@ -44,7 +49,9 @@ class Logger {
 
     constructor() {
         const transportDailyRotateFile = new winstonDailyRotateFile({
-            filename: '../logs/logfile-%DATE%.log',
+            dirname: LOG_DIR_PATH,
+            extension: '.log',
+            filename: 'dog-adopter-%DATE%',
             datePattern: 'YYYY-MM-DD-HH',
             zippedArchive: true,
             maxSize: '20m',
@@ -120,18 +127,18 @@ class Logger {
         }
 
         let lineTrace;
-        if (
-            ['local', 'test'].includes(NODE_ENV as string) ||
-            level === LEVELS.error
-        ) {
+        if (LOGGING_LINE_TRACE.includes(level) || level === LEVELS.error) {
             const error = new Error(message);
             lineTrace = this._getLineTrace(error);
+        }
+
+        if (lineTrace) {
+            options.lineTrace = lineTrace;
         }
 
         this.logger.log(level, message, {
             request_id,
             ...options,
-            ...{ lineTrace },
         });
     }
 
