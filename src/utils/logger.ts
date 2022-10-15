@@ -1,5 +1,6 @@
-import { LOGGING_MODE, NODE_ENV } from './environment-variables';
 import winston from 'winston';
+import winstonDailyRotateFile from 'winston-daily-rotate-file';
+import { LOGGING_MODE, NODE_ENV } from './environment-variables';
 
 const enum LEVELS {
     error = 'error',
@@ -42,8 +43,23 @@ class Logger {
     private logger;
 
     constructor() {
+        const transportDailyRotateFile = new winstonDailyRotateFile({
+            filename: '../logs/logfile-%DATE%.log',
+            datePattern: 'YYYY-MM-DD-HH',
+            zippedArchive: true,
+            maxSize: '20m',
+            maxFiles: '14d',
+            level: LOGGING_MODE,
+        });
+
+        transportDailyRotateFile.on(
+            'rotate',
+            function (oldFilename, newFilename) {}
+        );
+
         this.logger = winston.createLogger({
             transports: [
+                transportDailyRotateFile,
                 new winston.transports.Console({ level: LOGGING_MODE }),
             ],
             format: winston.format.combine(
