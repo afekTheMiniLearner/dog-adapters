@@ -3,6 +3,7 @@ import app from '../../app';
 import bcrypt from 'bcrypt';
 import { UserModel } from '../../models';
 import { IUser } from '../../interfaces/user.interface';
+import mongoose from 'mongoose';
 
 describe('auth route tests', function () {
     let userDoc: IUser;
@@ -163,4 +164,57 @@ describe('auth route tests', function () {
                 .expect(500);
         }
     });
+
+    test('get user by id API success & failed', async () => {
+        {
+            const res = await request(app)
+                .get(`/auth/${userDoc._id.toString()}`)
+                .set('Cookie', [cookie])
+                .expect(200);
+
+            expect(res).toBeDefined();
+            expect(res).toHaveProperty('_body.username', 'admin');
+            expect(res).toHaveProperty('_body.fullName', 'akef');
+        }
+        {
+            const body = {
+                username: 'afek0909',
+                password: 'afek0909',
+            };
+
+            await request(app)
+                .post('/auth/register')
+                .set('Accept', 'application/json')
+                .send(body)
+                .expect(201);
+
+            const result = await request(app)
+                .post('/auth/login')
+                .set('Accept', 'application/json')
+                .send(body)
+                .expect(302);
+
+            expect(result).toBeDefined();
+            const [cookie] = result.headers['set-cookie'];
+
+            UserModel.findOneAndDelete({ username: body.username });
+            //still works :\
+            await request(app)
+                .get(`/auth/${userDoc._id.toString()}`)
+                .set('Cookie', [cookie])
+                .expect(500);
+        }
+    });
+});
+
+test('disconnect from mongoose and trying to login', async () => {
+    {
+        mongoose.disconnect();
+
+        await request(app)
+            .post('/auth/login')
+            .set('Accept', 'application/json')
+            .send({ username: 'admin', password: 'admin' })
+            .expect(500);
+    }
 });
