@@ -34,7 +34,7 @@ userSchema.pre('save', async function (done) {
         this.password = hashed;
     }
     done();
-});*/
+}); */
 
 userSchema.methods.toJSON = function () {
     const obj = this.toObject();

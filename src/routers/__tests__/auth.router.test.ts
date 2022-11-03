@@ -42,8 +42,6 @@ describe('auth route tests', function () {
             expect(result).toHaveProperty('headers.set-cookie');
             expect(result.headers['set-cookie']).toHaveLength(1);
             expect(result.headers['set-cookie'][0]).toMatch(/connect\.sid=\w*/);
-
-            const [cookie] = result.headers['set-cookie'];
         }
         {
             const body = { username: 'i-dont-exist', password: '321' };
